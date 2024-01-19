@@ -33,6 +33,7 @@ const String kNamelNullError = "Vui lòng nhập tên của bạn";
 const String kPhoneNumberNullError = "Vui lòng nhập số điện thoại của bạn";
 const String kAddressNullError = "Vui lòng nhập địa chỉ của bạn";
 
+
 final otpInputDecoration = InputDecoration(
   contentPadding: const EdgeInsets.symmetric(vertical: 16),
   border: outlineInputBorder(),
