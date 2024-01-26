@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../../../constants.dart';
 
 class CheckoutCard extends StatelessWidget {
   const CheckoutCard({
-    Key? key,
+    Key? key,required this.totalCost,
   }) : super(key: key);
+  final int totalCost;
+
 
   @override
   Widget build(BuildContext context) {
+    final formattedTotalCost = NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(totalCost);
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 16,
@@ -60,14 +64,14 @@ class CheckoutCard extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text.rich(
                     TextSpan(
-                      text: "Total:\n",
+                      text: "Tổng:\n",
                       children: [
                         TextSpan(
-                          text: "\$337.15",
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          text: formattedTotalCost,
+                          style: const TextStyle(fontSize: 16, color: Colors.black),
                         ),
                       ],
                     ),

@@ -46,6 +46,7 @@ class PopularProducts extends StatelessWidget {
                   int price = documents?.docs[index]['price'];
                   bool isFavourite = documents?.docs[index]['isFavourite'];
                   String imageUrl = documents?.docs[index]['imageUrl'];
+                  String collectionId = documents?.docs[index].id ?? '';
 
                   return Container(
                     margin: EdgeInsets.only(left: 20),
@@ -59,6 +60,7 @@ class PopularProducts extends StatelessWidget {
                       price: price,
                       isFavourite: isFavourite,
                       imageUrl: imageUrl,
+                      collectionId: collectionId,
                       onPress: () {
                         // Handle the onTap event
                       },

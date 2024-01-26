@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProductCard extends StatelessWidget {
+import '../screens/details/details_screen.dart';
+
+class ProductCard extends StatefulWidget {
   const ProductCard({
     Key? key,
     this.width = 140.0,
-    this.aspectRetio = 1.8,
+    this.aspectRetio = 1.2,
     required this.productId,
     required this.title,
     required this.description,
@@ -14,6 +17,7 @@ class ProductCard extends StatelessWidget {
     required this.isFavourite,
     required this.imageUrl,
     required this.onPress,
+    required this.collectionId,
   }) : super(key: key);
 
   final double width, aspectRetio;
@@ -21,35 +25,82 @@ class ProductCard extends StatelessWidget {
   final int rating, price;
   final bool isFavourite;
   final String imageUrl;
+  final String collectionId;
   final VoidCallback onPress;
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  late bool isFavourite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavourite = widget.isFavourite;
+  }
+
+  void _toggleFavorite() async {
+    setState(() {
+      isFavourite = !isFavourite;
+    });
+
+    try {
+      // Update isFavourite state on Firestore
+      await FirebaseFirestore.instance
+          .collection('/ltuddd/5I19DY1GyC83pHREVndb/Product/')
+          .doc(widget.collectionId)
+          .update({'isFavourite': isFavourite});
+    } catch (e) {
+      print('Error updating isFavourite on Firestore: $e');
+      // Handle the error appropriately
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
-      child: GestureDetector(
-        onTap: onPress,
+      width: widget.width,
+      child: InkWell(
+        onTap: () => {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailsScreen(
+                productId: widget.productId,
+                title: widget.title,
+                description: widget.description,
+                rating: widget.rating,
+                price: widget.price,
+                isFavourite: widget.isFavourite,
+                imageUrl: widget.imageUrl,
+                collectionId: widget.collectionId,
+              ),
+            ),
+          )
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
-              aspectRatio: aspectRetio,
+              aspectRatio: widget.aspectRetio,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: imageUrl.isNotEmpty
+                child: widget.imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  fit: BoxFit.fill,
-                )
+                        widget.imageUrl,
+                        fit: BoxFit.fill,
+                      )
                     : Placeholder(),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              title,
+              widget.title,
               style: Theme.of(context).textTheme.bodyMedium,
               maxLines: 2,
             ),
@@ -57,16 +108,16 @@ class ProductCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$${price.toString()}',
+                  '\$${widget.price.toString()}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue, // Your desired color
+                    color: Colors.blue,
                   ),
                 ),
                 InkWell(
                   borderRadius: BorderRadius.circular(50),
-                  onTap: () {},
+                  onTap: _toggleFavorite,
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     height: 24,
@@ -78,43 +129,26 @@ class ProductCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Semantics(
-                      label: isFavourite ? 'Remove from favorites' : 'Add to favorites',
+                      label: isFavourite
+                          ? 'Remove from favorites'
+                          : 'Add to favorites',
                       child: SvgPicture.asset(
                         "assets/icons/Heart Icon_2.svg",
                         colorFilter: ColorFilter.mode(
-                          isFavourite ? const Color(0xFFFF4848) : const Color(0xFFDBDEE4),
+                          isFavourite
+                              ? const Color(0xFFFF4848)
+                              : const Color(0xFFDBDEE4),
                           BlendMode.srcIn,
                         ),
                       ),
+                    ),
                   ),
-                ),
                 )
               ],
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class ProductGrid extends StatelessWidget {
-  final List<ProductCard> products;
-
-  ProductGrid({required this.products});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return products[index];
-      },
     );
   }
 }
