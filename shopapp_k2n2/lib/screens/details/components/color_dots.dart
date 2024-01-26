@@ -2,28 +2,30 @@ import 'package:flutter/material.dart';
 
 import '../../../components/rounded_icon_btn.dart';
 import '../../../constants.dart';
-import '../../../models/Product.dart';
 
 class ColorDots extends StatelessWidget {
   const ColorDots({
     Key? key,
-    required this.product,
   }) : super(key: key);
-
-  final Product product;
 
   @override
   Widget build(BuildContext context) {
-    // Now this is fixed and only for demo
-    int selectedColor = 3;
+    List<Color> colors = [
+      const Color(0xFFF6625E),
+      const Color(0xFF836DB8),
+      const Color(0xFFDECB9C),
+      Colors.white,
+    ];
+    int selectedColor = 3; // Change this to the index of the selected color
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           ...List.generate(
-            product.colors.length,
-            (index) => ColorDot(
-              color: product.colors[index],
+            colors.length,
+                (index) => ColorDot(
+              color: colors[index],
               isSelected: index == selectedColor,
             ),
           ),
@@ -63,8 +65,9 @@ class ColorDot extends StatelessWidget {
       width: 40,
       decoration: BoxDecoration(
         color: Colors.transparent,
-        border:
-            Border.all(color: isSelected ? kPrimaryColor : Colors.transparent),
+        border: Border.all(
+          color: isSelected ? kPrimaryColor : Colors.transparent,
+        ),
         shape: BoxShape.circle,
       ),
       child: DecoratedBox(

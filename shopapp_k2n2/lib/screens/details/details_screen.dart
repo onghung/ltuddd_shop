@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../models/Product.dart';
 import '../cart/cart_screen.dart';
 import 'components/color_dots.dart';
 import 'components/product_description.dart';
@@ -11,13 +12,66 @@ import 'components/top_rounded_container.dart';
 class DetailsScreen extends StatelessWidget {
   static String routeName = "/details";
 
-  const DetailsScreen({super.key});
+  const DetailsScreen({
+    Key? key,
+    required this.productId,
+    required this.title,
+    required this.description,
+    required this.rating,
+    required this.price,
+    required this.isFavourite,
+    required this.imageUrl,
+    required this.collectionId,
+  }) : super(key: key);
+
+  final String productId, title, description;
+  final int rating, price;
+  final bool isFavourite;
+  final String imageUrl;
+  final String collectionId;
+
+
+  Future<void> _addCart() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final cartRef = FirebaseFirestore.instance.collection('/ltuddd/5I19DY1GyC83pHREVndb/cart');
+
+    try {
+      // Kiểm tra xem đã có cart của người dùng với "id" đã cho hay chưa
+      final existingCart = await cartRef
+          .where('user', isEqualTo: user?.email)
+          .where('id', isEqualTo: productId)
+          .get();
+
+      if (existingCart.docs.isEmpty) {
+        // Nếu chưa có cart, thêm mới
+        await cartRef.add({
+          'user': user?.email,
+          'imageUrl': imageUrl,
+          'description': description,
+          'id': productId,
+          'isFavourite': isFavourite,
+          'price': price,
+          'rating': rating,
+          'title': title,
+          'count': 1,
+        });
+
+        print('Image added to Firestore with URL: $imageUrl');
+      } else {
+        // Nếu đã có cart, tăng 'count' thêm 1 đơn vị
+        final cartDocId = existingCart.docs.first.id;
+        final existingCount = existingCart.docs.first['count'] ?? 0;
+        await cartRef.doc(cartDocId).update({'count': existingCount + 1});
+
+        print('Increased count for the product in the cart');
+      }
+    } catch (e) {
+      print('Error adding image to Firestore: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ProductDetailsArguments agrs =
-        ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
-    final product = agrs.product;
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -57,9 +111,9 @@ class DetailsScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Text(
-                      "4.7",
-                      style: TextStyle(
+                     Text(
+                      '$rating',
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -76,20 +130,21 @@ class DetailsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          ProductImages(product: product),
+          ProductImages(Url: imageUrl ),
           TopRoundedContainer(
             color: Colors.white,
             child: Column(
               children: [
                 ProductDescription(
-                  product: product,
+                  descrip: description,
+                  title: title,
                   pressOnSeeMore: () {},
                 ),
                 TopRoundedContainer(
                   color: const Color(0xFFF6F7F9),
                   child: Column(
                     children: [
-                      ColorDots(product: product),
+                      ColorDots(),
                     ],
                   ),
                 ),
@@ -105,6 +160,7 @@ class DetailsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: ElevatedButton(
               onPressed: () {
+                _addCart();
                 Navigator.pushNamed(context, CartScreen.routeName);
               },
               child: const Text("Add To Cart"),
@@ -114,10 +170,4 @@ class DetailsScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class ProductDetailsArguments {
-  final Product product;
-
-  ProductDetailsArguments({required this.product});
 }

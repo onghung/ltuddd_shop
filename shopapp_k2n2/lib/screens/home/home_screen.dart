@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../addScreen.dart';
 import 'components/categories.dart';
 import 'components/discount_banner.dart';
 import 'components/home_header.dart';
@@ -12,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return  const Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 16),
@@ -21,6 +22,7 @@ class HomeScreen extends StatelessWidget {
               HomeHeader(),
               DiscountBanner(),
               Categories(),
+              // AddIcon(),
               SpecialOffers(),
               SizedBox(height: 20),
               PopularProducts(),

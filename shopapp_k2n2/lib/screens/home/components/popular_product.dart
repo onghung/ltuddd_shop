@@ -1,13 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import '../../../components/product_card.dart';
-import '../../../models/Product.dart';
-import '../../details/details_screen.dart';
+import '../../../constants.dart';
 import '../../products/products_screen.dart';
 import 'section_title.dart';
 
 class PopularProducts extends StatelessWidget {
-  const PopularProducts({super.key});
+  const PopularProducts({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,36 +21,56 @@ class PopularProducts extends StatelessWidget {
             },
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                demoProducts.length,
-                (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () => Navigator.pushNamed(
-                          context,
-                          DetailsScreen.routeName,
-                          arguments: ProductDetailsArguments(
-                              product: demoProducts[index]),
-                        ),
-                      ),
-                    );
-                  }
+        SizedBox(
+          height: 300,
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('/ltuddd/5I19DY1GyC83pHREVndb/Product')
+                .snapshots(),
+            builder: (ctx, streamSnapshot) {
+              if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              final documents = streamSnapshot.data;
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: documents?.docs.length,
+                itemBuilder: (ctx, index) {
+                  // Extract information from the document
+                  String productId = documents?.docs[index]['id'];
+                  String title = documents?.docs[index]['title'];
+                  String description = documents?.docs[index]['description'];
+                  int rating = documents?.docs[index]['rating'];
+                  int price = documents?.docs[index]['price'];
+                  bool isFavourite = documents?.docs[index]['isFavourite'];
+                  String imageUrl = documents?.docs[index]['imageUrl'];
+                  String collectionId = documents?.docs[index].id ?? '';
 
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
+                  return Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: ProductCard(
+                      width: 140, // Set your desired width
+                      aspectRetio: 1.02,
+                      productId: productId,
+                      title: title,
+                      description: description,
+                      rating: rating,
+                      price: price,
+                      isFavourite: isFavourite,
+                      imageUrl: imageUrl,
+                      collectionId: collectionId,
+                      onPress: () {
+                        // Handle the onTap event
+                      },
+                    ),
+                  );
                 },
-              ),
-              const SizedBox(width: 20),
-            ],
+              );
+            },
           ),
-        )
+        ),
       ],
     );
   }
