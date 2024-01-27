@@ -1,11 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'components/forgot_pass_form.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   static String routeName = "/forgot_password";
 
-  const ForgotPasswordScreen({super.key});
+  const ForgotPasswordScreen({Key? key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

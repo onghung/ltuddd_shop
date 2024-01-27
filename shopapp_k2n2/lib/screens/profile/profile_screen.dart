@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled15/screens/sign_in/sign_in_screen.dart';
 
 import 'components/profile_menu.dart';
@@ -14,7 +15,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    void _showLogoutConfirmationDialog() {
+    void _showLogoutConfirmationDialog(BuildContext context) async {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -30,8 +31,15 @@ class ProfileScreen extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  Navigator.pushNamed(context, SignInScreen.routeName);
+                  // Clear "Remember Me" status
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('rememberMe', false);
+
+                  // Sign out the user
                   await FirebaseAuth.instance.signOut();
+
+                  // Navigate to SignInScreen
+                  Navigator.pushReplacementNamed(context, SignInScreen.routeName);
                 },
                 child: Text("Có"),
               ),
@@ -42,13 +50,15 @@ class ProfileScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Hồ sơ"),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
+            Text(
+              "Profile",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 80),
             const ProfilePic(),
             const SizedBox(height: 20),
             Text("${user?.email ?? ''}"),
@@ -76,7 +86,7 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenu(
               text: "Đăng xuất",
               icon: "assets/icons/Log out.svg",
-              press: _showLogoutConfirmationDialog,
+              press: () => _showLogoutConfirmationDialog(context),
             ),
           ],
         ),

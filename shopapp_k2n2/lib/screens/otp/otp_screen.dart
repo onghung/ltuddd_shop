@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../constants.dart';
-
-import 'components/otp_form.dart';
+import '../sign_in/sign_in_screen.dart';
 
 class OtpScreen extends StatelessWidget {
   static String routeName = "/otp";
 
-  const OtpScreen({super.key});
+  const OtpScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,14 +26,14 @@ class OtpScreen extends StatelessWidget {
                   "OTP Verification",
                   style: headingStyle,
                 ),
-                const Text("We sent your code to +1 898 860 ***"),
+                const Text("Chúng tôi đã gửi đến hòm thư email của bạn"),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("This code will expired in "),
+                    const Text("Hãy truy cập đường link để hoàn tất"),
                     TweenAnimationBuilder(
-                      tween: Tween(begin: 30.0, end: 0.0),
-                      duration: const Duration(seconds: 30),
+                      tween: Tween(begin: 90.0, end: 0.0),
+                      duration: const Duration(seconds: 90),
                       builder: (_, dynamic value, child) => Text(
                         "00:${value.toInt()}",
                         style: const TextStyle(color: kPrimaryColor),
@@ -41,17 +41,29 @@ class OtpScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const OtpForm(),
+                const SizedBox(height: 200),
+                ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.currentUser?.reload();
+                    if (FirebaseAuth.instance.currentUser?.emailVerified == true) {
+                      Navigator.pushNamed(context, SignInScreen.routeName);
+                    } else {
+                      // Email is not verified
+                      // You can show an error message or prompt the user to resend OTP
+                    }
+                  },
+                  child: const Text("Verify OTP"),
+                ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {
-                    // OTP code resend
+                  onTap: () async {
+                    await FirebaseAuth.instance.currentUser?.sendEmailVerification();
                   },
                   child: const Text(
                     "Resend OTP Code",
                     style: TextStyle(decoration: TextDecoration.underline),
                   ),
-                )
+                ),
               ],
             ),
           ),
