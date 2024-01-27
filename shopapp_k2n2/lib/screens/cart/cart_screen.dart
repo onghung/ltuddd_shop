@@ -8,7 +8,7 @@ import 'components/cart_card.dart';
 class CartScreen extends StatefulWidget {
   static String routeName = "/cart";
 
-  const CartScreen({super.key});
+  const CartScreen({Key? key}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -17,6 +17,32 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   int totalQuantity = 0;
   int totalCost = 0;
+
+  Future<void> decreaseProductCount(String productId, int currentCount) async {
+    if (currentCount > 1) {
+      await FirebaseFirestore.instance
+          .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+          .doc(productId)
+          .update({'count': currentCount - 1});
+      setState(() {});
+    } else {
+      // Nếu 'count' giảm về 0, xóa sản phẩm khỏi Firebase
+      await FirebaseFirestore.instance
+          .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+          .doc(productId)
+          .delete();
+      setState(() {});
+    }
+  }
+
+
+  Future<void> increaseProductCount(String productId, int currentCount) async {
+    await FirebaseFirestore.instance
+        .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+        .doc(productId)
+        .update({'count': currentCount + 1});
+    setState(() {});
+  }
 
 
   @override
@@ -75,8 +101,7 @@ class _CartScreenState extends State<CartScreen> {
                         .doc(cartItems[index].id)
                         .delete();
 
-                    setState(() {
-                    });
+                    setState(() {});
                   },
                   background: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -92,15 +117,23 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                   child: CartCard(
-                    price: cartItems[index]['price'] ?? 0,
                     productId: cartItems[index]['id'] ?? '',
                     title: cartItems[index]['title'] ?? '',
                     description: cartItems[index]['description'] ?? '',
                     rating: cartItems[index]['rating'] ?? 0,
+                    price: cartItems[index]['price'] ?? 0,
+                    count: cartItems[index]['count'] ?? 0,
                     isFavourite: cartItems[index]['isFavourite'] ?? false,
                     imageUrl: cartItems[index]['imageUrl'] ?? '',
                     collectionId: cartItems[index].id,
-                    count: cartItems[index]['count'] ?? 0,
+                    onIncrease: () {
+                      increaseProductCount(
+                          cartItems[index].id, cartItems[index]['count'] ?? 0);
+                    },
+                    onDecrease: () {
+                      decreaseProductCount(
+                          cartItems[index].id, cartItems[index]['count'] ?? 0);
+                    },
                   ),
                 ),
               ),
@@ -148,7 +181,7 @@ class _CartScreenState extends State<CartScreen> {
     num total = 0;
 
     for (var doc in snapshot.docs) {
-      total = total+ (doc['count'] ?? 0) * (doc['price'] ?? 0);
+      total = total + (doc['count'] ?? 0) * (doc['price'] ?? 0);
     }
 
     return total;

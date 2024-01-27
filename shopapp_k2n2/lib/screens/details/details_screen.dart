@@ -140,8 +140,8 @@ class DetailsScreen extends StatelessWidget {
                   title: title,
                   pressOnSeeMore: () {},
                 ),
-                TopRoundedContainer(
-                  color: const Color(0xFFF6F7F9),
+                const TopRoundedContainer(
+                  color: Color(0xFFF6F7F9),
                   child: Column(
                     children: [
                       ColorDots(),

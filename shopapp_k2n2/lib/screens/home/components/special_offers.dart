@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:untitled15/screens/products/products_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../components/themed_products.dart';
+import '../../products/products_screen.dart';
 import 'section_title.dart';
 
 class SpecialOffers extends StatelessWidget {
@@ -23,20 +25,52 @@ class SpecialOffers extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              SpecialOfferCard(
-                image: "assets/images/Image Banner 2.png",
-                category: "Smartphone",
-                numOfBrands: 18,
-                press: () {
-                  Navigator.pushNamed(context, ProductsScreen.routeName);
+              FutureBuilder<int>(
+                future: countProducts('device'), // Đếm số lượng sản phẩm với 'seri'='device'
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    int numOfDeviceProducts = snapshot.data ?? 0;
+                    return SpecialOfferCard(
+                      image: "assets/images/Image Banner 2.png",
+                      category: "Device",
+                      numOfBrands: numOfDeviceProducts,
+                      press: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ThemedProducts(seri: 'device'),
+                          ),
+                        );
+
+                      },
+                    );
+                  }
                 },
               ),
-              SpecialOfferCard(
-                image: "assets/images/Image Banner 3.png",
-                category: "Fashion",
-                numOfBrands: 24,
-                press: () {
-                  Navigator.pushNamed(context, ProductsScreen.routeName);
+              FutureBuilder<int>(
+                future: countProducts('fashion'), // Đếm số lượng sản phẩm với 'seri'='fashion'
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    int numOfFashionProducts = snapshot.data ?? 0;
+                    return SpecialOfferCard(
+                      image: "assets/images/Image Banner 3.png",
+                      category: "Fashion",
+                      numOfBrands: numOfFashionProducts,
+                      press: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ThemedProducts(seri: 'fashion'),
+                          ),
+                        );
+
+                      },
+                    );
+                  }
                 },
               ),
               const SizedBox(width: 20),
@@ -45,6 +79,15 @@ class SpecialOffers extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<int> countProducts(String seri) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+        .collection('/ltuddd/5I19DY1GyC83pHREVndb/Product')
+        .where('seri', isEqualTo: seri)
+        .get();
+
+    return snapshot.size;
   }
 }
 
@@ -108,7 +151,7 @@ class SpecialOfferCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        TextSpan(text: "$numOfBrands Brands")
+                        TextSpan(text: "$numOfBrands Sản phẩm")
                       ],
                     ),
                   ),

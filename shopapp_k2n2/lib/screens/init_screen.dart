@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:untitled15/constants.dart';
+import 'package:untitled15/screens/chat/chat_screen.dart';
 import 'package:untitled15/screens/favorite/favorite_screen.dart';
 import 'package:untitled15/screens/profile/profile_screen.dart';
 
@@ -30,92 +31,95 @@ class _InitScreenState extends State<InitScreen> {
   final pages = [
     const HomeScreen(),
     const FavoriteScreen(),
-    const Center(
-      child: Text("Chat"),
-    ),
-    const ProfileScreen()
+    ChatScreen(),
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[currentSelectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: updateCurrentIndex,
-        currentIndex: currentSelectedIndex,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        body: pages[currentSelectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: updateCurrentIndex,
+          currentIndex: currentSelectedIndex,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/icons/Shop Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  inActiveIconColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
+              activeIcon: SvgPicture.asset(
+                "assets/icons/Shop Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  kPrimaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
+              label: "Home",
             ),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/icons/Heart Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  inActiveIconColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
+              activeIcon: SvgPicture.asset(
+                "assets/icons/Heart Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  kPrimaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
+              label: "Fav",
             ),
-            label: "Fav",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/icons/Chat bubble Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  inActiveIconColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
+              activeIcon: SvgPicture.asset(
+                "assets/icons/Chat bubble Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  kPrimaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
+              label: "Chat",
             ),
-            label: "Chat",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/icons/User Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  inActiveIconColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
+              activeIcon: SvgPicture.asset(
+                "assets/icons/User Icon.svg",
+                colorFilter: const ColorFilter.mode(
+                  kPrimaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
+              label: "Profile",
             ),
-            label: "Fav",
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
