@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../../complete_profile/complete_profile_screen.dart';
+import 'package:untitled15/screens/otp/otp_screen.dart';
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants.dart';
+String? email;
+String? password;
+String? conform_password;
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -14,12 +17,10 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
-  String? email;
-  String? password;
-  String? conform_password;
+
   bool remember = false;
   final List<String?> errors = [];
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
   void addError({String? error}) {
     if (!errors.contains(error)) {
       setState(() {
@@ -137,11 +138,22 @@ class _SignUpFormState extends State<SignUpForm> {
           FormError(errors: errors),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                if (_formKey.currentState!.validate()) {
+                  if (email != null && password != null) {
+                    bool otpSent = await sendOTPToEmail(email!, password!);
+                    if (otpSent) {
+                      Navigator.pushNamed(context, OtpScreen.routeName);
+                    } else {
+                      // Handle error if OTP sending fails
+                    }
+                  } else {
+                    // Handle the case where email or password is null
+                  }
+                }
+                Navigator.pushNamed(context, OtpScreen.routeName);
               }
             },
             child: const Text("Tiếp tục"),
@@ -149,5 +161,18 @@ class _SignUpFormState extends State<SignUpForm> {
         ],
       ),
     );
+  }
+  Future<bool> sendOTPToEmail(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      await _auth.currentUser?.sendEmailVerification();
+      return true;
+    } catch (e) {
+      print("Error: $e");
+      return false;
+    }
   }
 }

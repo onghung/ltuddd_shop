@@ -1,13 +1,34 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/no_account_text.dart';
 import '../../components/socal_card.dart';
+import '../home/home_screen.dart';
+import '../init_screen.dart';
+import '../login_success/login_success_screen.dart';
 import 'components/sign_form.dart';
+
 
 class SignInScreen extends StatelessWidget {
   static String routeName = "/sign_in";
 
-  const SignInScreen({super.key});
+  const SignInScreen({Key? key}) : super(key: key);
+
+  Future<bool> getRememberMePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('rememberMe') ?? false;
+  }
+
+  void navigateBasedOnRememberMe(BuildContext context) async {
+    bool rememberMe = await getRememberMePreference();
+    if (rememberMe) {
+      Navigator.pushNamed(context, InitScreen.routeName);
+    } else {
+      Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +62,9 @@ class SignInScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
-                    const SignForm(),
+                    SignForm(onContinuePressed: () {
+                      navigateBasedOnRememberMe(context);
+                    }),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

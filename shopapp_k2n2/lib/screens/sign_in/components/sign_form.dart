@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -9,7 +10,8 @@ import '../../forgot_password/forgot_password_screen.dart';
 import '../../login_success/login_success_screen.dart';
 
 class SignForm extends StatefulWidget {
-  const SignForm({super.key});
+  const SignForm({Key? key, required this.onContinuePressed}) : super(key: key);
+  final VoidCallback onContinuePressed;
 
   @override
   _SignFormState createState() => _SignFormState();
@@ -46,8 +48,14 @@ class _SignFormState extends State<SignForm> {
         password: passController.text.trim(),
       );
 
-      // Đăng nhập thành công, chuyển hướng đến màn hình thành công
-      Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+      // Lưu trạng thái "Nhớ mật khẩu" vào SharedPreferences
+      if (remember!) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('rememberMe', true);
+      }
+
+      // Đăng nhập thành công, không cần chuyển hướng ngay lúc này
+
     } catch (e) {
       // Đăng nhập không thành công, xử lý lỗi hoặc hiển thị thông báo
       print("Đăng nhập không thành công: $e");
@@ -96,7 +104,6 @@ class _SignFormState extends State<SignForm> {
           const SizedBox(height: 20),
           TextFormField(
             controller: passController,
-
             onChanged: (value) {
               if (value.isNotEmpty) {
                 removeError(error: kPassNullError);
@@ -154,7 +161,8 @@ class _SignFormState extends State<SignForm> {
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                checkAccount();  // Thay vì ngay lập tức chuyển hướng, kiểm tra tài khoản trước
+                checkAccount();
+                widget.onContinuePressed();
               }
             },
             child: const Text("Tiếp tục"),

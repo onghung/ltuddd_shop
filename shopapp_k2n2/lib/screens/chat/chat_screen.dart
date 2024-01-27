@@ -7,6 +7,7 @@ import 'components/mesage_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   static String routeName = "/chats";
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -17,12 +18,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Admin Chat'),
-      ),
-      body: Column(
+    return SafeArea(
+      child: Column(
         children: [
+          Text(
+            "Trò chuyện",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           Expanded(
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -41,7 +43,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    ChatMessage message = ChatMessage.fromDocument(messages[index]);
+                    ChatMessage message =
+                        ChatMessage.fromDocument(messages[index]);
                     return MessageWidget(message: message);
                   },
                 );
@@ -90,5 +93,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-
