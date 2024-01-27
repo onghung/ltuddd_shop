@@ -30,16 +30,6 @@ class ColorDots extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          RoundedIconBtn(
-            icon: Icons.remove,
-            press: () {},
-          ),
-          const SizedBox(width: 20),
-          RoundedIconBtn(
-            icon: Icons.add,
-            showShadow: true,
-            press: () {},
-          ),
         ],
       ),
     );

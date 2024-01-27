@@ -3,9 +3,6 @@ import 'package:untitled15/screens/splash/splash_screen.dart';
 
 import 'routes.dart';
 import 'theme.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {

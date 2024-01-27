@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
-import '../../../constants.dart';
-
-class CheckoutCard extends StatelessWidget {
-  const CheckoutCard({
-    Key? key,required this.totalCost,
+class CheckoutCard extends StatefulWidget {
+   CheckoutCard({
+    Key? key,
+    required this.totalCost,
   }) : super(key: key);
-  final int totalCost;
 
+  int totalCost;
+
+  @override
+  _CheckoutCardState createState() => _CheckoutCardState();
+}
+
+class _CheckoutCardState extends State<CheckoutCard> {
+  int _selectedVoucherIndex = -1;
+  List<int> discountAmounts = [100000, 150000]; // Discount amounts for each voucher
 
   @override
   Widget build(BuildContext context) {
-    final formattedTotalCost = NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(totalCost);
+    final formattedTotalCost = NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(widget.totalCost);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 16,
         horizontal: 20,
       ),
-      // height: 174,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -31,7 +38,7 @@ class CheckoutCard extends StatelessWidget {
             offset: const Offset(0, -15),
             blurRadius: 20,
             color: const Color(0xFFDADADA).withOpacity(0.15),
-          )
+          ),
         ],
       ),
       child: SafeArea(
@@ -52,13 +59,17 @@ class CheckoutCard extends StatelessWidget {
                   child: SvgPicture.asset("assets/icons/receipt.svg"),
                 ),
                 const Spacer(),
-                const Text("Add voucher code"),
+                GestureDetector(
+                  onTap: () {
+                    _showVoucherList(context); // Function to show voucher list
+                  },
+                  child: const Text("Add voucher code"),
+                ),
                 const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_ios,
                   size: 12,
-                  color: kTextColor,
-                )
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -90,4 +101,54 @@ class CheckoutCard extends StatelessWidget {
       ),
     );
   }
+
+  void _showVoucherList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          children: [
+            _buildVoucherTile(0, 'Voucher 1: giảm 100k giá trị đơn hàng'),
+            _buildVoucherTile(1, 'Voucher 2: giảm 150k giá trị đơn hàng'),
+          ],
+        );
+      },
+    );
+  }
+
+  ListTile _buildVoucherTile(int index, String title) {
+    bool isSelected = _selectedVoucherIndex == index;
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.green : Colors.black,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      onTap: () {
+        _selectVoucher(index, discountAmounts[index]);
+      },
+    );
+  }
+
+  void _selectVoucher(int index, int discountAmount) {
+    if (_selectedVoucherIndex == index) {
+      // If the same voucher is clicked again, reset the selection
+      setState(() {
+        _selectedVoucherIndex = -1;
+        // Add back the discount to the totalCost
+        widget.totalCost += discountAmount;
+      });
+    } else {
+      setState(() {
+        _selectedVoucherIndex = index;
+        // Deduct the discount from the totalCost
+        widget.totalCost -= discountAmount;
+      });
+    }
+
+    Navigator.pop(context); // Close the voucher list bottom sheet
+  }
+
 }

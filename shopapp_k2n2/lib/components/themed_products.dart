@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled15/components/product_card.dart';
 
-class ProductsScreen extends StatelessWidget {
-  const ProductsScreen({Key? key});
+class ThemedProducts extends StatelessWidget {
+  const ThemedProducts({Key? key, required this.seri}) : super(key: key);
 
-  static String routeName = "/products";
+  final String seri;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Products"),
+        title: Text("Products - $seri"),
       ),
       body: SafeArea(
         child: Padding(
@@ -19,6 +19,7 @@ class ProductsScreen extends StatelessWidget {
           child: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('/ltuddd/5I19DY1GyC83pHREVndb/Product')
+                .where('seri', isEqualTo: seri)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,7 +60,7 @@ class ProductsScreen extends StatelessWidget {
             },
           ),
         ),
-        ),
-      );
+      ),
+    );
   }
 }
