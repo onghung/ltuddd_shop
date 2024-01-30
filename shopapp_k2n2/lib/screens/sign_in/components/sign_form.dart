@@ -56,6 +56,10 @@ class _SignFormState extends State<SignForm> {
 
       // Đăng nhập thành công, không cần chuyển hướng ngay lúc này
 
+      // Clear errors on successful login
+      setState(() {
+        errors.clear();
+      });
     } catch (e) {
       // Đăng nhập không thành công, xử lý lỗi hoặc hiển thị thông báo
       print("Đăng nhập không thành công: $e");
@@ -158,13 +162,20 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                checkAccount();
-                widget.onContinuePressed();
+
+                // Check account and handle errors
+                await checkAccount();
+
+                // Proceed with the next steps only if there are no errors
+                if (errors.isEmpty) {
+                  widget.onContinuePressed();
+                }
               }
             },
+
             child: const Text("Tiếp tục"),
           ),
         ],

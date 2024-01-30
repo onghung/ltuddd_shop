@@ -43,7 +43,6 @@ class DetailsScreen extends StatelessWidget {
           .get();
 
       if (existingCart.docs.isEmpty) {
-        // Nếu chưa có cart, thêm mới
         await cartRef.add({
           'user': user?.email,
           'imageUrl': imageUrl,
@@ -54,11 +53,11 @@ class DetailsScreen extends StatelessWidget {
           'rating': rating,
           'title': title,
           'count': 1,
+          'status':'1'
         });
 
         print('Image added to Firestore with URL: $imageUrl');
       } else {
-        // Nếu đã có cart, tăng 'count' thêm 1 đơn vị
         final cartDocId = existingCart.docs.first.id;
         final existingCount = existingCart.docs.first['count'] ?? 0;
         await cartRef.doc(cartDocId).update({'count': existingCount + 1});

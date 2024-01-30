@@ -49,7 +49,8 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-
+    calculateTotalCost();
+    calculateTotalQuantity();
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -87,7 +88,6 @@ class _CartScreenState extends State<CartScreen> {
           }
 
           List<QueryDocumentSnapshot> cartItems = snapshot.data!.docs;
-
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ListView.builder(
@@ -106,7 +106,7 @@ class _CartScreenState extends State<CartScreen> {
                     setState(() {});
                   },
                   background: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 21),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFE6E6),
                       borderRadius: BorderRadius.circular(15),
