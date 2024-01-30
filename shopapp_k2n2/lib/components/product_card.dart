@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 import '../screens/details/details_screen.dart';
 
@@ -108,7 +109,7 @@ class _ProductCardState extends State<ProductCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$${widget.price.toString()}',
+                  NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(widget.price),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

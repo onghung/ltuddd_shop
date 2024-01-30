@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:untitled15/screens/bill/bill_screen.dart';
 
 class CheckoutCard extends StatefulWidget {
-   CheckoutCard({
+  CheckoutCard({
     Key? key,
     required this.totalCost,
   }) : super(key: key);
@@ -17,6 +20,8 @@ class CheckoutCard extends StatefulWidget {
 class _CheckoutCardState extends State<CheckoutCard> {
   int _selectedVoucherIndex = -1;
   List<int> discountAmounts = [100000, 150000]; // Discount amounts for each voucher
+
+  bool get isCartEmpty => widget.totalCost == 0;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +78,11 @@ class _CheckoutCardState extends State<CheckoutCard> {
               ],
             ),
             const SizedBox(height: 16),
+            if (isCartEmpty) // Display a message if the cart is empty
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text("Hãy tiếp tục mua sắm."),
+              ),
             Row(
               children: [
                 Expanded(
@@ -90,7 +100,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: isCartEmpty ? null : _checkout, // Disable button if cart is empty
                     child: const Text("Check Out"),
                   ),
                 ),
@@ -134,21 +144,50 @@ class _CheckoutCardState extends State<CheckoutCard> {
 
   void _selectVoucher(int index, int discountAmount) {
     if (_selectedVoucherIndex == index) {
-      // If the same voucher is clicked again, reset the selection
       setState(() {
         _selectedVoucherIndex = -1;
-        // Add back the discount to the totalCost
         widget.totalCost += discountAmount;
       });
     } else {
       setState(() {
         _selectedVoucherIndex = index;
-        // Deduct the discount from the totalCost
         widget.totalCost -= discountAmount;
       });
     }
 
-    Navigator.pop(context); // Close the voucher list bottom sheet
+    Navigator.pop(context);
   }
 
+  void _checkout() {
+    _updateStatusInFirebase();
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BillScreen(),
+      ),
+    );
+  }
+
+  void _updateStatusInFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final collectionReference = FirebaseFirestore.instance.collection('/ltuddd/5I19DY1GyC83pHREVndb/cart');
+
+      await collectionReference
+          .where('user', isEqualTo: user.email)
+          .where('status', isEqualTo: '1')
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          collectionReference.doc(doc.id).update({
+            'status': '2',
+            'pricelast': widget.totalCost,
+          });
+        });
+      });
+    }
+  }
 }
+

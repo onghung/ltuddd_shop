@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:untitled15/screens/bill/bill_screen.dart';
 import 'package:untitled15/screens/cart/cart_screen.dart';
 import 'package:untitled15/screens/chat/chat_screen.dart';
 import 'package:untitled15/screens/products/products_screen.dart';
@@ -16,6 +17,7 @@ import 'screens/splash/splash_screen.dart';
 
 final Map<String, WidgetBuilder> routes = {
   InitScreen.routeName: (context) => const InitScreen(),
+  BillScreen.routeName: (context) => const BillScreen(),
   SplashScreen.routeName: (context) => const SplashScreen(),
   SignInScreen.routeName: (context) => const SignInScreen(),
   ForgotPasswordScreen.routeName: (context) => const ForgotPasswordScreen(),

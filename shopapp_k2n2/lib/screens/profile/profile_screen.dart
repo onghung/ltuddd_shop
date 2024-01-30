@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled15/screens/sign_in/sign_in_screen.dart';
 
+import 'components/infor_screen.dart';
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
 
@@ -66,7 +67,14 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenu(
               text: "Tài khoản của tôi",
               icon: "assets/icons/User Icon.svg",
-              press: () => {},
+              press: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PersonalInfoWidget(),
+                  ),
+                ),
+              },
             ),
             ProfileMenu(
               text: "Thông báo",

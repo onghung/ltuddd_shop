@@ -17,6 +17,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   int totalQuantity = 0;
   int totalCost = 0;
+  String status = '1';
 
   Future<void> decreaseProductCount(String productId, int currentCount) async {
     if (currentCount > 1) {
@@ -78,6 +79,7 @@ class _CartScreenState extends State<CartScreen> {
         stream: FirebaseFirestore.instance
             .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
             .where('user', isEqualTo: user?.email)
+            .where('status', isEqualTo: status)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -160,6 +162,7 @@ class _CartScreenState extends State<CartScreen> {
     final snapshot = await FirebaseFirestore.instance
         .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
         .where('user', isEqualTo: user?.email)
+        .where('status', isEqualTo: status)
         .get();
 
     num total = 0;
@@ -176,6 +179,7 @@ class _CartScreenState extends State<CartScreen> {
     final snapshot = await FirebaseFirestore.instance
         .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
         .where('user', isEqualTo: user?.email)
+        .where('status', isEqualTo: status)
         .get();
 
     num total = 0;
