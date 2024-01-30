@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:untitled15/constants.dart';
@@ -6,6 +7,7 @@ import 'package:untitled15/screens/favorite/favorite_screen.dart';
 import 'package:untitled15/screens/profile/profile_screen.dart';
 
 import '../constants.dart';
+import '../screen_adm/home_adm/home_adm.dart';
 import 'home/home_screen.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
@@ -21,6 +23,7 @@ class InitScreen extends StatefulWidget {
 
 class _InitScreenState extends State<InitScreen> {
   int currentSelectedIndex = 0;
+  final user = FirebaseAuth.instance.currentUser;
 
   void updateCurrentIndex(int index) {
     setState(() {
@@ -34,6 +37,12 @@ class _InitScreenState extends State<InitScreen> {
     ChatScreen(),
     const ProfileScreen(),
   ];
+  final pagesAdm = [
+    HomeAdm(),
+    const FavoriteScreen(),
+    ChatScreen(),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +51,7 @@ class _InitScreenState extends State<InitScreen> {
         return false;
       },
       child: Scaffold(
-        body: pages[currentSelectedIndex],
+        body:user?.email=='admin@gmail.com'?pagesAdm[currentSelectedIndex]:pages[currentSelectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           onTap: updateCurrentIndex,
           currentIndex: currentSelectedIndex,

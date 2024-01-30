@@ -11,7 +11,7 @@ class CheckoutCard extends StatefulWidget {
     required this.totalCost,
   }) : super(key: key);
 
-  int totalCost;
+  num totalCost;
 
   @override
   _CheckoutCardState createState() => _CheckoutCardState();
