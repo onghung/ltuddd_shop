@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../bill/bill_screen.dart';
 import '../../cart/cart_screen.dart';
 import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
@@ -25,8 +26,13 @@ class HomeHeader extends StatelessWidget {
           const SizedBox(width: 8),
           IconBtnWithCounter(
             svgSrc: "assets/icons/Bell.svg",
-            numOfitem: 3,
-            press: () {},
+            press: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BillScreen(),
+              ),
+            );},
           ),
         ],
       ),

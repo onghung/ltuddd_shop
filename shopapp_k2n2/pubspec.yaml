@@ -49,6 +49,9 @@ dependencies:
   flutter_firebase_chat_core: ^1.6.7
   cloud_functions: ^4.1.0
   shared_preferences: ^2.2.2
+#  flutter_hl_vnpay: ^2.0.1
+#  crypto: 3.0.3
+
 
 dev_dependencies:
   flutter_test:
