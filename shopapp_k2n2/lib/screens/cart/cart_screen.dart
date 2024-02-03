@@ -12,12 +12,30 @@ class CartScreen extends StatefulWidget {
 
   @override
   State<CartScreen> createState() => _CartScreenState();
-}
 
+}
 class _CartScreenState extends State<CartScreen> {
   int totalQuantity = 0;
   int totalCost = 0;
   String status = '1';
+  @override
+  void initState() {
+    super.initState();
+    refreshPage(); // Call the refresh method when the widget is initialized
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    refreshPage(); // Call the refresh method when dependencies change
+  }
+
+  Future<void> refreshPage() async {
+    // Calculate total cost and total quantity
+    await calculateTotalCost();
+    await calculateTotalQuantity();
+    setState(() {}); // Update the state to trigger a rebuild
+  }
 
   Future<void> decreaseProductCount(String productId, int currentCount) async {
     if (currentCount > 1) {
@@ -44,6 +62,7 @@ class _CartScreenState extends State<CartScreen> {
         .update({'count': currentCount + 1});
     setState(() {});
   }
+
 
 
   @override
