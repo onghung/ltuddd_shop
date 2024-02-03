@@ -4,6 +4,9 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
 
 import '../../constants.dart';
+import 'components/donhang.dart';
+import 'components/finalcial.dart';
+import 'components/report.dart';
 
 class HomeAdm extends StatefulWidget {
   HomeAdm({Key? key}) : super(key: key);
@@ -105,47 +108,7 @@ class _HomeAdmState extends State<HomeAdm> {
                       return CircularProgressIndicator();
                     }
                     int totalPricelast = snapshot.data ?? 0;
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      width: 155,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: greenColor.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 3,
-                          ),
-                        ],
-                        color: greenColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "2024",
-                            style: TextStyle(fontSize: 15, color: Colors.white),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            "Tổng doanh thu",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                          Text(
-                            "(triệu)",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "${NumberFormat.simpleCurrency(decimalDigits: 2).format(totalPricelast / 1000000)}",
-                            style: TextStyle(
-                              fontSize: 32,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    return report(totalPricelast: totalPricelast);
                   },
                 ),
 
@@ -159,47 +122,7 @@ class _HomeAdmState extends State<HomeAdm> {
                       return CircularProgressIndicator();
                     }
                     int totalCount = snapshot.data ?? 0;
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      width: 155,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: purpleColor.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 3,
-                          ),
-                        ],
-                        color: purpleColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "2024",
-                            style: TextStyle(fontSize: 15, color: Colors.white),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            "Tổng đơn hàng",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                          Text(
-                            "(sản phẩm)",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "$totalCount",
-                            style: TextStyle(
-                              fontSize: 32,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    return donhang(totalCount: totalCount);
                   },
                 ),
               ],
@@ -276,11 +199,7 @@ class _HomeAdmState extends State<HomeAdm> {
   }
 }
 
-class Financial {
-  final String id;
-  final int value;
-  final Color barColor;
 
-  Financial(this.id, this.value, this.barColor);
-}
+
+
 
