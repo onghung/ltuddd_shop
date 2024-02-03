@@ -1,41 +1,78 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:intl/intl.dart';
 
-class HomeAdm extends StatelessWidget {
-  const HomeAdm({Key? key}) : super(key: key);
-  static final greenColor = Color(0xFFF39C3AD);
-  static final purpleColor = Color(0xFFF6351CB);
+import '../../constants.dart';
 
-  static final List<Financial> expensesData = [
-    Financial('2014', 5, greenColor),
-    Financial('2015', 25, greenColor),
-    Financial('2016', 100, greenColor),
-    Financial('2018', 50, greenColor),
-    Financial('2019', 25, greenColor),
-  ];
-  static final List<Financial> revenueData = [
-    Financial('2014', 7, purpleColor),
-    Financial('2015', 29, purpleColor),
-    Financial('2016', 120, purpleColor),
-    Financial('2018', 40, purpleColor),
-    Financial('2019', 55, purpleColor),
-  ];
+class HomeAdm extends StatefulWidget {
+  HomeAdm({Key? key}) : super(key: key);
+
+  @override
+  State<HomeAdm> createState() => _HomeAdmState();
+}
+
+class _HomeAdmState extends State<HomeAdm> {
+  List<Financial> expensesData = [];
+
+  List<Financial> revenueData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromFirebase();
+  }
+
+  Future<void> fetchDataFromFirebase() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance
+          .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+          .where('status', isEqualTo: '3')
+          .get();
+
+      // Clear existing data
+      revenueData.clear();
+
+      // Create a map to store the total count for each id
+      Map<String, int> idToTotalCount = {};
+
+      for (var doc in snapshot.docs) {
+        String id = doc['id'];
+        int count = doc['count'] ?? 0;
+        Color color = getColorFromData(doc);
+
+        Financial financial = Financial(id, count, color);
+
+        // Update the total count for each id
+        idToTotalCount[id] = (idToTotalCount[id] ?? 0) + count;
+
+        // Add the financial object to the list
+        revenueData.add(financial);
+      }
+
+      // Now revenueData contains the Financial objects, each with the total count for the corresponding id
+
+      setState(() {}); // Trigger a rebuild after data is fetched
+    } catch (e) {
+      // Handle error
+      print('Error fetching data: $e');
+    }
+  }
+
+  Color getColorFromData(QueryDocumentSnapshot doc) {
+    // Implement your logic to determine the color based on the data
+    // For example, you can return greenColor for expenses and purpleColor for revenue.
+    return  purpleColor;
+  }
 
   @override
   Widget build(BuildContext context) {
     List<charts.Series<Financial, String>> expensesAndRevenueSeries = [
       charts.Series(
-        id: "Expenses",
-        data: expensesData,
-        domainFn: (Financial pops, _) => pops.year,
-        measureFn: (Financial pops, _) => pops.value,
-        colorFn: (Financial pops, __) =>
-            charts.ColorUtil.fromDartColor(pops.barColor),
-      ),
-      charts.Series(
-        id: "Revenue",
+        id: "Đơn hàng",
         data: revenueData,
-        domainFn: (Financial pops, _) => pops.year,
+        domainFn: (Financial pops, _) => pops.id,
         measureFn: (Financial pops, _) => pops.value,
         colorFn: (Financial pops, __) =>
             charts.ColorUtil.fromDartColor(pops.barColor),
@@ -52,131 +89,198 @@ class HomeAdm extends StatelessWidget {
               fontWeight: FontWeight.bold, color: Colors.black, fontSize: 24),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 25,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                width: 155,
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                    color: greenColor.withOpacity(0.5),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                  ),
-                ], color: greenColor, borderRadius: BorderRadius.circular(15)),
-                child: Column(
-                  children: const [
-                    Text(
-                      "2022",
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: 6,
-                    ),
-                    Text("Total Revenue",
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    Text("(in millions)",
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text("\$20",
-                        style: TextStyle(
-                            fontSize: 32,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 25),
+
+            // Row for displaying "Tổng doanh thu"
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<int>(
+                  future: calculateTotalPricelast(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    int totalPricelast = snapshot.data ?? 0;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      width: 155,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: greenColor.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 3,
+                          ),
+                        ],
+                        color: greenColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "2024",
+                            style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Tổng doanh thu",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          Text(
+                            "(triệu)",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "${NumberFormat.simpleCurrency(decimalDigits: 2).format(totalPricelast / 1000000)}",
+                            style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ),
-              const SizedBox(
-                width: 25,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                width: 155,
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                    color: purpleColor.withOpacity(0.5),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                  ),
-                ], color: purpleColor, borderRadius: BorderRadius.circular(15)),
-                child: Column(
-                  children: const [
-                    Text(
-                      "2022",
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: 6,
-                    ),
-                    Text("Total Profit",
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    Text("(in millions)",
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text("\$2",
-                        style: TextStyle(
-                            fontSize: 32,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
+
+                const SizedBox(width: 25),
+
+                // Row for displaying "Tổng đơn hàng"
+                FutureBuilder<int>(
+                  future: calculateTotalCount(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    int totalCount = snapshot.data ?? 0;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      width: 155,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: purpleColor.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 3,
+                          ),
+                        ],
+                        color: purpleColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "2024",
+                            style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Tổng đơn hàng",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          Text(
+                            "(sản phẩm)",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "$totalCount",
+                            style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 45,
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 25),
-            height: MediaQuery.of(context).size.height / 2,
-            decoration: BoxDecoration(
+              ],
+            ),
+
+            const SizedBox(height: 45),
+
+            // Container for the BarChart
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+              height: MediaQuery.of(context).size.height / 2,
+              decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      spreadRadius: 0.5,
-                      blurRadius: 2,
-                      offset: Offset(2, 3)),
-                ]),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: charts.BarChart(
-                expensesAndRevenueSeries,
-                animate: true,
-                defaultRenderer: charts.BarRendererConfig(
-                  cornerStrategy: const charts.ConstCornerStrategy(40),
-                ),
-                primaryMeasureAxis: const charts.NumericAxisSpec(
-                  tickProviderSpec: charts.BasicNumericTickProviderSpec(
-                    desiredTickCount: 7,
+                    color: Colors.black.withOpacity(0.15),
+                    spreadRadius: 0.5,
+                    blurRadius: 2,
+                    offset: Offset(2, 3),
                   ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: charts.BarChart(
+                  expensesAndRevenueSeries,
+                  animate: true,
+                  defaultRenderer: charts.BarRendererConfig(
+                    cornerStrategy: const charts.ConstCornerStrategy(40),
+                  ),
+                  primaryMeasureAxis: const charts.NumericAxisSpec(
+                    tickProviderSpec: charts.BasicNumericTickProviderSpec(
+                      desiredTickCount: 7,
+                    ),
+                  ),
+                  behaviors: [charts.SeriesLegend()],
                 ),
-                behaviors: [charts.SeriesLegend()],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Future<int> calculateTotalPricelast() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+    await FirebaseFirestore.instance
+        .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+        .where('status', isEqualTo: '3')
+        .get();
+
+    int totalPricelast = snapshot.docs
+        .map((doc) => (doc['pricelast'] ?? 0) as int)
+        .fold(0, (prev, curr) => prev + curr);
+
+    return totalPricelast;
+  }
+
+  Future<int> calculateTotalCount() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+    await FirebaseFirestore.instance
+        .collection('/ltuddd/5I19DY1GyC83pHREVndb/cart')
+        .where('status', isEqualTo: '3')
+        .get();
+
+    int totalCount = snapshot.docs
+        .map((doc) => (doc['count'] ?? 0) as int)
+        .fold(0, (prev, curr) => prev + curr);
+
+    return totalCount;
   }
 }
 
 class Financial {
-  final String year;
+  final String id;
   final int value;
   final Color barColor;
 
-  Financial(this.year, this.value, this.barColor);
+  Financial(this.id, this.value, this.barColor);
 }
+

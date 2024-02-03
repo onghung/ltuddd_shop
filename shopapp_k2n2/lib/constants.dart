@@ -4,6 +4,10 @@ const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const contentColorCyan = Color(0xFF50E4FF);
 const contentColorBlue = Color(0xFF2196F3);
+const purpleColor = Color(0xFFF6351CB);
+const greenColor = Color(0xFFF39C3AD);
+
+
 
 const kPrimaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,
