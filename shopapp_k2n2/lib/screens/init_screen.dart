@@ -7,7 +7,9 @@ import 'package:untitled15/screens/favorite/favorite_screen.dart';
 import 'package:untitled15/screens/profile/profile_screen.dart';
 
 import '../constants.dart';
+import '../screen_adm/edit_product/home_edit_product.dart';
 import '../screen_adm/home_adm/home_adm.dart';
+import '../screen_adm/mesadm_screen.dart';
 import 'home/home_screen.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
@@ -39,8 +41,8 @@ class _InitScreenState extends State<InitScreen> {
   ];
   final pagesAdm = [
     HomeAdm(),
-    const FavoriteScreen(),
-    ChatScreen(),
+    EdiProduct(),
+    UsersListScreen(),
     const ProfileScreen(),
   ];
 

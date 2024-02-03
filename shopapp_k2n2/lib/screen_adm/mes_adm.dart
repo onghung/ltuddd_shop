@@ -3,28 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../model/model_chat.dart';
-import 'components/mesage_widget.dart';
+import '../screens/chat/components/mesage_widget.dart';
 
-class ChatScreen extends StatefulWidget {
-  static String routeName = "/chats";
+class ChatScreenadm extends StatefulWidget {
+  static String routeName = "/chatsadm";
+  final String contactEmail;
+
+  ChatScreenadm({required this.contactEmail});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreenadm> {
   TextEditingController _messageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
-    return SafeArea(
-      child: Column(
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Trò chuyện"),
+      ),
+      body: Column(
         children: [
-          Text(
-            "Trò chuyện",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
           Expanded(
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -43,16 +46,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    ChatMessage message =
-                    ChatMessage.fromDocument(messages[index]);
-                    bool isSentByUser = message.user == user.email;
+                    ChatMessage message = ChatMessage.fromDocument(messages[index]);
+                    bool isSentByUser = user.email == message.user;
                     return MessageWidget(message: message, isSentByUser: isSentByUser);
                   },
                 );
               },
             ),
           ),
-          // Phần nhập tin nhắn
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -68,11 +69,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 IconButton(
                   icon: Icon(Icons.send),
                   onPressed: () {
-                    // Gửi tin nhắn lên Firestore
+                    // Gửi tin nhắn à Firestore
                     if (_messageController.text.isNotEmpty) {
                       ChatMessage message = ChatMessage(
                         user: '${user.email}',
-                        contact: 'admin@gmail.com',
+                        contact: widget.contactEmail,
                         text: _messageController.text,
                         date: DateTime.now(),
                       );
@@ -81,7 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           .collection('/ltuddd/5I19DY1GyC83pHREVndb/chat')
                           .add(message.toMap());
 
-                      // Xóa nội dung trong ô nhập tin nhắn sau khi gửi
+                      // Effacer le contenu dans la zone de texte après envoi
                       _messageController.clear();
                     }
                   },
